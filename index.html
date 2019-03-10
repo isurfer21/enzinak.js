@@ -1,18 +1,45 @@
 <!doctype html>
 <html>
     <head>
-        <title>Home</title>
-        <link href="styles/main.css" rel="stylesheet" type="text/css">
+        <title>Demo</title>
+        <link href="css/main.css" rel="stylesheet" type="text/css">
     </head>
     <body>
-        <header>Demo</header>
+        <header>
+            <h1>Demo boiler-plate application</h1>
+        </header>
         <div id="sections">
-            <section id="home"><b>home</b></section>
-            <section id="about"><b>about</b></section>
-            <section id="contact"><b>contact</b></section>
+            <section id="home">
+                <h3>Home</h3>
+                <p>A home page or a start page is the initial or main web page of a website or a browser. The initial page of a website is sometimes called main page as well.</p>
+                <p>
+                    <a href="#" data-link="main/about">About</a>
+                    <a href="#" data-link="main/contact">Contact</a>
+                </p>
+            </section>
+            <section id="about">
+                <h3>About</h3>
+                <p>The about us page is commonly used by all types of businesses to give customers more insight into who is involved with a given business and exactly what it does.</p>
+                <p>
+                    <a href="#" data-link="main/home">Home</a>
+                    <a href="#" data-link="main/contact">Contact</a>
+                </p>
+            </section>
+            <section id="contact">
+                <h3>Contact</h3>
+                <p>A contact page is a standard web page on a website used to allow the visitor to contact the website owner or people who are responsible for the maintenance of the site.</p>
+                <p>
+                    <a href="#" data-link="main/home">Home</a>
+                    <a href="#" data-link="main/about">About</a>
+                </p>
+            </section>
         </div>
-        <footer>Abhishek Kumar &copy; 2014</footer>
-        <script src="scripts/enzinak.js"></script>
-        <script src="scripts/main.js"></script>
+        <footer>
+            <br><br><br>
+            <p><small>Made with &#10084; by Abhishek Kumar</small></p>
+        </footer>
+
+        <script src="js/enzinak.js"></script>
+        <script src="js/main.js"></script>
     </body>
 </html>
