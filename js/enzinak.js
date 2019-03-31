@@ -207,7 +207,7 @@ enzinak.ObjectList = function() {
         return null;
     };
     this.removeItemByKey = function(key, val) {
-        var item = fetchItemByKey('id', id);
+        var item = fetchItemByKey(key, val);
         if (item != null) {
             return delete item;
         }
