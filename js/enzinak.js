@@ -82,17 +82,21 @@ enzinak.Style = {
         else
             new RegExp('(^| )' + className + '( |$)', 'gi').test(elementRef.className);
     },
-    addClass: function(elementRef, className) {
-        if (elementRef.classList)
-            elementRef.classList.add(className);
-        else
-            elementRef.className += ' ' + className;
+    addClass: function(elementRef, classNames) {
+        if (elementRef.classList) {
+            var classes = classNames.split(' ');
+            elementRef.classList.add(...classes);
+        } else {
+            elementRef.className += ' ' + classNames;
+        }
     },
-    removeClass: function(elementRef, className) {
-        if (elementRef.classList)
-            elementRef.classList.remove(className);
-        else
-            elementRef.className = elementRef.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+    removeClass: function(elementRef, classNames) {
+        if (elementRef.classList) {
+            var classes = classNames.split(' ');
+            elementRef.classList.remove(...classes);
+        } else {
+            elementRef.className = elementRef.className.replace(new RegExp('(^|\\b)' + classNames.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+        }
     },
     toggleClass: function(className) {
         if (elementRef.classList) {
@@ -519,7 +523,7 @@ enzinak.FormValidator = function() {
         fieldprefix = prefix;
     };
     this.isValid = function(values) {
-        var totalerrors = [];
+        var totalerrors = 0;
         for (i in fields) {
             var status = null,
                 isrequired = false;
@@ -556,12 +560,12 @@ enzinak.FormValidator = function() {
                         break;
                 }
                 if (status !== null && !status) {
-                    totalerrors.push('x');
+                    totalerrors++;
                     break;
                 }
             }
         }
-        return (totalerrors.join('').length > 0) ? false : true;
+        return (totalerrors > 0) ? false : true;
     };
 };
 
@@ -695,7 +699,7 @@ enzinak.Determine = {
 enzinak.Session = function(sessionId) {
     var SESSION;
     var _constructor = function(sid) {
-        STORAGE = sid;
+        SESSION = sid;
     }(sessionId);
     this.clear = function(data) {
         localStorage.removeItem(SESSION);
