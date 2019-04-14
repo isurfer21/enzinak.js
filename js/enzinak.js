@@ -289,16 +289,16 @@ enzinak.Templator = {
     },
     /**
      *  Usage:
-     *      enzinak.Templator.castAs('[firstname] [lastname]', ['firstname', 'lastname'], "<[0]>");
+     *      enzinak.Templator.castAs('[0] [1]', ['firstname', 'lastname'], "<[0]>");
      *  Result:
      *      <firstname> <lastname>
      **/
-    castAs: function(template, keylist, cast) {
-        var tag, key, output = template;
-        for (var i = 0; i < keylist.length; i++) {
-            key = keylist[i];
+    castAs: function(template, map, cast) {
+        var tag, value, output = template;
+        for (var key in map) {
+            value = map[key];
             tag = new RegExp("\\[" + key + "\\]", 'g')
-            output = output.replace(tag, this.fitIn(cast, [key]));
+            output = output.replace(tag, this.fitIn(cast, [value]));
         }
         return output;
     }
