@@ -260,12 +260,10 @@ enzinak.Collection = function() {
 };
 
 enzinak.Templator = {
-    /**
-     *  Usage:
-     *      enzinak.Templator.fitIn('<a href="#[0]" title="[1]">[1]</a>', ['test1.html', 'Test1']);
-     *  Result:
-     *      <a href="#test1.html" title="Test1">Test1</a>
-     **/
+    /* e.g.,
+        enzinak.Templator.fitIn('<a href="#[0]" title="[1]">[1]</a>', ['test1.html', 'Test1']);
+        -> '<a href="#test1.html" title="Test1">Test1</a>''
+    */
     fitIn: function(template, arglist) {
         var output = template;
         for (var i = 0; i < arglist.length; i++) {
@@ -273,12 +271,10 @@ enzinak.Templator = {
         }
         return output;
     },
-    /**
-     *  Usage:
-     *      enzinak.Templator.fixIn('<a href="#[Link]" title="[Content]">[Content]</a>', { Link: 'test1.html', Content: 'Test1' });
-     *  Result:
-     *      <a href="#test1.html" title="Test1">Test1</a>
-     **/
+    /* e.g.,
+        enzinak.Templator.fixIn('<a href="#[Link]" title="[Content]">[Content]</a>', { Link: 'test1.html', Content: 'Test1' });
+        -> '<a href="#test1.html" title="Test1">Test1</a>'
+    */
     fixIn: function(template, hashtable) {
         var tag, output = template;
         for (var key in hashtable) {
@@ -287,12 +283,10 @@ enzinak.Templator = {
         }
         return output;
     },
-    /**
-     *  Usage:
-     *      enzinak.Templator.castAs('[0] [1]', ['firstname', 'lastname'], "<[0]>");
-     *  Result:
-     *      <firstname> <lastname>
-     **/
+    /* e.g.,
+        enzinak.Templator.castAs('[0] [1]', ['firstname', 'lastname'], "<[0]>");
+        -> '<firstname> <lastname>'
+    */
     castAs: function(template, map, cast) {
         var tag, value, output = template;
         for (var key in map) {
@@ -404,7 +398,7 @@ enzinak.HashMap = function(map) {
     var self = this,
         list;
     var _constructor = function(iMap) {
-        //list = (map != undefined) ? ((typeof(map) == 'string') ? JSON.parse(map) : map) : {};
+        //list = (iMap != undefined) ? ((typeof(iMap) == 'string') ? JSON.parse(iMap) : iMap) : {};
         list = (iMap != undefined) ? iMap : {};
     }(map);
     this.isEmpty = function() {
@@ -788,26 +782,80 @@ enzinak.Date = {
     }
 };
 
-String.prototype.autofit = function() {
-    var formatted = this,
-        list = arguments[0];
-    for (var prop in list) {
-        formatted = formatted.replace(new RegExp('\\[' + prop + '\\]', 'g'), list[prop]);
-    }
-    return formatted;
-};
-
+/* e.g.,
+    '[D]/[M]/[Y]'.graft({ Y:2019, M:4, D:21 });
+    -> '21/4/2019'
+    '[2]-[1]-[0]'.graft([2019, 'April', 21]);
+    -> '21-April-2019'
+    '[1] [0], [2]'.graft(21, 'April', 2019);
+    -> 'April 21, 2019'
+*/
 String.prototype.graft = function() {
-    var formatted = this;
-    for (var arg in arguments) {
-        formatted = formatted.replace("[" + arg + "]", arguments[arg]);
+    let self = this;
+    if (arguments.length == 1 && typeof arguments[0] == 'object' && !Array.isArray(arguments[0])) {
+        for (let arg in arguments[0]) {
+            self = self.replace(new RegExp('\\[' + arg + '\\]', 'g'), arguments[0][arg]);
+        }
+    } else {
+        for (let i = 0; i < arguments.length; i++) {
+            self = self.replace('[' + i + ']', arguments[i]);
+        }
     }
-    return formatted;
+    return self;
 };
 
+/* e.g.,
+    ['firstname'].implant('.error[for="…"]');
+    -> '.error[for="firstname"]'
+    ['test@domain.com', 'tester', 'Tester'].implant('<a href="mailto:…" title="…">…</a>');
+    -> '<a href="mailto:test@domain.com" title="tester">Tester</a>'
+    ['admin', 'Q2DsVgy4BHuibU6LjD9w'].implant('./tally/?id=#&token=#', '#');
+    -> './tally/?id=admin&token=Q2DsVgy4BHuibU6LjD9w'
+*/
 Array.prototype.implant = function() {
     var pattern = (!!arguments[1]) ? new RegExp(arguments[1]) : /…/;
     return this.reduce(function(p, c) {
         return p.replace(pattern, c);
     }, arguments[0]);
+};
+
+/* e.g., 
+    '2019-04-21T12:00:31Z'.toDateTimeObject();
+    -> { Y:2019, M:4, D:21, h:12, m:0, s:31 }
+*/
+String.prototype.toDateTimeObject = function() {
+    let self = this;
+        dtStr = self.split(/\.|Z/),
+        dtList = (dtStr.length > 0) ? dtStr[0].split(/ |T/) : [],
+        dateStr = (dtList.length > 0) ? dtList[0].trim() : null,
+        timeStr = (dtList.length > 1) ? dtList[1].trim() : null,
+        tarikh = (!!dateStr) ? dateStr.split(/-|\//) : null,
+        samay = (!!timeStr) ? timeStr.split(':') : null,
+        dateObj = {
+            Y: parseInt(tarikh[0]),
+            M: parseInt(tarikh[1]),
+            D: parseInt(tarikh[2]),
+            h: parseInt(samay[0]),
+            m: parseInt(samay[1]),
+            s: parseInt(samay[2]),
+        };
+    return dateObj;
+};
+
+/* e.g., 
+    '2019-04-21T12:00:31Z'.inDateTimePattern('[D]/[M]/[Y] [h]:[m]:[s]', true);
+    -> '21/04/2019 12:00:31'
+    '2019-04-21 12:00:31.000000'.inDateTimePattern('[D]/[M]/[Y] [h]:[m]:[s]', false);
+    -> '21/4/2019 12:0:31'
+*/
+String.prototype.inDateTimePattern = function() {
+    let self = this,
+        pattern = arguments[0],
+        padding = arguments[1],
+        dtObj = self.toDateTimeObject();
+    for (let i in dtObj) {
+        dtObj[i] = (!!padding && dtObj[i] < 10) ? '0' + dtObj[i] : dtObj[i];
+    }
+    pattern = pattern.graft(dtObj);
+    return pattern;
 };
